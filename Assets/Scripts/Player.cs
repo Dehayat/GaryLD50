@@ -3,19 +3,29 @@ using static UnityEngine.InputSystem.InputAction;
 
 public class Player : MonoBehaviour
 {
+    public static Player instance;
 
     public float moveSpeed = 5f;
+    public GameObject destructionEffect;
+    [Header("Sounds")]
+    public AudioClip pickUpSound;
+    public AudioClip dropSound;
+    public AudioClip extendSound;
+    public AudioClip breakSound;
 
     private Rigidbody2D rb;
     private BasePickup currentPickup;
 
     private BasePickup currentItem;
     private Animator anim;
+    private AudioSource audioSource;
 
     private void Awake()
     {
+        instance = this;
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
     public void MoveInput(CallbackContext input)
     {
@@ -24,10 +34,15 @@ public class Player : MonoBehaviour
         if (movement.sqrMagnitude > Mathf.Epsilon)
         {
             anim.SetBool("walk", true);
+            if (!audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
         }
         else
         {
             anim.SetBool("walk", false);
+            audioSource.Stop();
         }
     }
 
@@ -37,10 +52,16 @@ public class Player : MonoBehaviour
         {
             if (currentItem != null)
             {
+                audioSource.PlayOneShot(dropSound);
+                if (currentItem.GetComponent<Stopper>() != null)
+                {
+                    audioSource.PlayOneShot(extendSound);
+                }
                 DropCurrentItem();
             }
-            if (currentPickup != null)
+            else if (currentPickup != null)
             {
+                audioSource.PlayOneShot(pickUpSound);
                 PickUpCurrentPickup();
             }
         }
@@ -76,6 +97,12 @@ public class Player : MonoBehaviour
         {
             currentPickup = null;
         }
+    }
+
+    public void BreakEffect(Vector3 position)
+    {
+        GameObject.Instantiate(destructionEffect, position, Quaternion.identity);
+        audioSource.PlayOneShot(breakSound);
     }
 
 }

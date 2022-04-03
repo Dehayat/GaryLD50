@@ -3,12 +3,16 @@ using UnityEngine;
 
 public class Generator : MonoBehaviour
 {
-    public GameObject item;
+    public GameObject[] items;
     public float spawnInterval = 3;
+    public AnimationCurve intervalCurve;
 
     [Header("Generator Limits")]
     public float x1;
     public float y1, x2, y2;
+
+
+    public bool isGenerating = false;
 
     public float overlapTestSize = 1f;
 
@@ -16,7 +20,9 @@ public class Generator : MonoBehaviour
 
     private void Update()
     {
-        if (Time.time >= lastSpawn + spawnInterval)
+        if (!isGenerating) return;
+        float currentSpawnInteval = spawnInterval * intervalCurve.Evaluate(Time.time);
+        if (Time.time >= lastSpawn + currentSpawnInteval)
         {
             lastSpawn = Time.time;
             DropItem();
@@ -27,7 +33,7 @@ public class Generator : MonoBehaviour
     {
         Vector3 itemPosition = GeneratePosition();
         //Vector3 itemPosition = new Vector3(UnityEngine.Random.Range(x1, x2), UnityEngine.Random.Range(y1, y2), 0);
-        GameObject.Instantiate(item, itemPosition, Quaternion.identity);
+        GameObject.Instantiate(items[UnityEngine.Random.Range(0, items.Length)], itemPosition, Quaternion.identity);
     }
     private Vector3 GeneratePosition()
     {

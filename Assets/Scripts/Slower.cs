@@ -8,11 +8,12 @@ public class Slower : BasePickup
     private Collider2D pickupTrigger;
     private Rigidbody2D ownerRB;
     private WallOfDeath affectedWallOfDeath = null;
-
+    private Animator anim;
     private void Awake()
     {
         pickupTrigger = GetComponent<Collider2D>();
         ownerRB = pickupTrigger.attachedRigidbody;
+        anim = GetComponent<Animator>();
     }
 
     private void Start()
@@ -37,6 +38,10 @@ public class Slower : BasePickup
 
     private void OnDestroy()
     {
+        if (Player.instance != null)
+        {
+            Player.instance.BreakEffect(transform.position);
+        }
         RemoveWallEffect();
     }
 
@@ -64,11 +69,13 @@ public class Slower : BasePickup
         pickupTrigger.enabled = false;
         ownerRB.simulated = false;
         RemoveWallEffect();
+        anim.Play("PickUp");
     }
     public override void Drop()
     {
         pickupTrigger.enabled = true;
         ownerRB.simulated = true;
+        anim.Play("Drop");
     }
     #endregion
 }

@@ -15,8 +15,8 @@ TagManager:
   - Player
   - Objects
   - Pickup
-  - 
-  - 
+  - WallOfDeathTrigger
+  - empty
   - 
   - 
   - 
